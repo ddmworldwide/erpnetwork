@@ -1,0 +1,118 @@
+namespace org.erp.mari
+
+/*************************************************************
+STORE -
+  if multi store network permissions need to be handled
+  on prem or cloud? permissions still need to be handled
+*************************************************************/
+participant Store identified by id {
+  o String id
+  o String name
+  o String email optional
+  o String address optional 
+
+}
+
+/**********************************************************************
+PRODUCT - 
+  the product being sold
+*************************************************************************/
+asset Product identified by id{
+    o String id
+    o String name
+    o String description optional
+    o AdditionalInformation[] info optional
+    o Price[] price
+}
+
+//price per unit
+concept Price{
+    o Double price
+    o Unit unit
+    o String type // type of product being sold, grass, oil, wax etc (another Enum probs)
+}
+
+// any additional info for product (a key-value pair relationship)
+concept AdditionalInformation{
+    o String key
+    o String information
+}
+
+// units (logic offering discounts based on unit being order)
+enum Unit{
+    o gram
+    o eighth
+    o quarter
+    o half
+    o ounce
+    o pound
+    o Joint
+    //any other unit we might need? 
+    
+}
+
+
+/**********************************************************
+ORDER - placing an order for a product
+  smart contract between customer and store/seller
+*************************************************************/
+
+asset Order identified by id{
+    o String id
+    o DateTime time
+    o ProductSale[] productSale
+    --> Store store optional // will eventually be require just easy for testing this way\
+    o String description optional
+    o String customerId optional //if available for loyalty program to come later
+
+}
+
+// The transaction is to be broken up in peices for reporting 
+// will be handled later. Useful for tracting transaction time, maybe delivery time etc.
+// good data to have. 
+enum statusOfSale{
+    o Created
+    o Ordered
+    o OutForDelivery
+    o Delivered
+    o Paid
+    o Complete
+}
+
+concept SaleStatus{
+    o DateTime time
+    o statusOfSale status
+    
+}
+
+
+concept ProductSale{
+  --> Product product 
+    o Double amount // in grams (weight to be calculated during transaction level) ? might not be best idea.
+    o Double salePrice  // in dollars (crypto or otherwise price should be in dollars) ? not not be best idea. Order peice needs more attention
+    o Double discount optional 
+    o SaleStatus[] saleStatus
+    
+}
+
+
+/**********************************************************
+Transactions
+
+*************************************************************/
+
+transaction ChangeAssetValue {
+  o String newValue
+  --> Asset relatedAsset
+}
+
+
+
+
+
+
+
+
+
+
+
